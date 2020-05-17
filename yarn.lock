@@ -551,8 +551,10 @@ destroy@~1.0.4:
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
   integrity sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA=
 
-dia-agents-baseservice@../dia-agents-baseservice:
+dia-agent-baseservice@^0.1.0:
   version "0.1.0"
+  resolved "https://registry.yarnpkg.com/dia-agent-baseservice/-/dia-agent-baseservice-0.1.0.tgz#05a0c13f1a277a620618a48b7354fbc38db80def"
+  integrity sha512-+IPNX53VrLRlxO+7XYOanEKkRx9QOAQzJzsEgeww43m5KphRy4gMfzKVhbKJ7YQZ/DE/5dAgPHwVztPF5UAfGQ==
   dependencies:
     axios "^0.19.0"
     cookie-parser "~1.4.4"

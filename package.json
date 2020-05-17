@@ -11,8 +11,8 @@
     "debug": "ndb ./index.js"
   },
   "dependencies": {
-    "puppeteer": "3.0.4",
-    "dia-agents-baseservice": "../dia-agents-baseservice"
+    "dia-agent-baseservice": "^0.1.0",
+    "puppeteer": "3.0.4"
   },
   "devDependencies": {
     "ndb": "^1.1.5"
