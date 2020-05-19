@@ -20,10 +20,10 @@ function getConfigs() {
         process.env.CUSTOM_FUNCTION_TIMEOUT || 1 * 60 * 1000, // Timeout value for a customFun call
     };
 
-    if (process.env.HEADLESS === undefined || process.env.HEADLESS === null) {
-      configs.HEADLESS = true;
+    if (process.env.HEADLESS === 'false' || process.env.HEADLESS === false) {
+      configs.HEADLESS = false;
     } else {
-      configs.HEADLESS = !!process.env.HEADLESS;
+      configs.HEADLESS = true;
     }
 
     if (!configs.MUNEW_BASE_URL) {

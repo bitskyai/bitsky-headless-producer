@@ -19,8 +19,7 @@ async function headlessCrawler(intelligences, jobId, agentConfiguration) {
     if (!__browser) {
       const params = {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        // headless: configs["HEADLESS"],
-        headless: false,
+        headless: configs["HEADLESS"],
         defaultViewport: null,
       };
       __browser = await puppeteer.launch(params);
