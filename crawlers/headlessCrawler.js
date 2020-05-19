@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 const _ = require("lodash");
-const logger = require("dia-agents-baseservice/lib/utils/logger");
+const logger = require("dia-agent-baseservice/lib/utils/logger");
 const { getConfigs } = require("../utils");
 
 let __browser;
@@ -19,7 +19,8 @@ async function headlessCrawler(intelligences, jobId, agentConfiguration) {
     if (!__browser) {
       const params = {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: configs["HEADLESS"],
+        // headless: configs["HEADLESS"],
+        headless: false,
         defaultViewport: null,
       };
       __browser = await puppeteer.launch(params);
