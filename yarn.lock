@@ -143,6 +143,23 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.0.0.tgz#23c0df14f6a88077f5f986c0d167ec03c3d5537c"
   integrity sha512-Phlt0plgpIIBOGTT/ehfFnbNlfsDEiqmzE2KRXoX1bLIlir4X/MR+zSyBEkL05ffWgnRSf/DXv+WrUAVr93/ow==
 
+bitspider-agent-baseservice@0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/bitspider-agent-baseservice/-/bitspider-agent-baseservice-0.1.7.tgz#ec1b16d2286dc3363a275e7925f7f648649cc897"
+  integrity sha512-4DGc9mKtZU+050+onxfkFHjCAhoT27NQ1skxAoZHkmZuYeUpllAqfwDMWzCVltXeuZiUoR5N602kNSmDpqHxnw==
+  dependencies:
+    axios "^0.19.0"
+    cookie-parser "~1.4.4"
+    express "~4.16.1"
+    fs-extra "^7.0.1"
+    http-errors "^1.6.3"
+    jade "~1.11.0"
+    lodash "^4.17.15"
+    morgan "~1.9.1"
+    server-destroy "^1.0.1"
+    uuid "^7.0.3"
+    winston "^3.2.1"
+
 bl@^4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/bl/-/bl-4.0.2.tgz#52b71e9088515d0606d9dd9cc7aa48dc1f98e73a"
@@ -550,23 +567,6 @@ destroy@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
   integrity sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA=
-
-dia-agent-baseservice@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/dia-agent-baseservice/-/dia-agent-baseservice-0.1.0.tgz#05a0c13f1a277a620618a48b7354fbc38db80def"
-  integrity sha512-+IPNX53VrLRlxO+7XYOanEKkRx9QOAQzJzsEgeww43m5KphRy4gMfzKVhbKJ7YQZ/DE/5dAgPHwVztPF5UAfGQ==
-  dependencies:
-    axios "^0.19.0"
-    cookie-parser "~1.4.4"
-    express "~4.16.1"
-    fs-extra "^7.0.1"
-    http-errors "^1.6.3"
-    jade "~1.11.0"
-    lodash "^4.17.15"
-    morgan "~1.9.1"
-    server-destroy "^1.0.1"
-    uuid "^7.0.3"
-    winston "^3.2.1"
 
 diagnostics@^1.1.1:
   version "1.1.1"

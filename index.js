@@ -1,5 +1,5 @@
-const { headlessCrawler } = require("./crawlers/headlessCrawler");
-const baseservice = require("dia-agent-baseservice");
+const { headlessCrawler } = require("./workers/headlessWorker");
+const baseservice = require("bitspider-agent-baseservice");
 baseservice.express();
 baseservice.type("HEADLESSBROWSER");
 baseservice.worker(headlessCrawler);

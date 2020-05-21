@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 const _ = require("lodash");
-const logger = require("dia-agent-baseservice/lib/utils/logger");
+const logger = require("bitspider-agent-baseservice/lib/utils/logger");
 const { getConfigs } = require("../utils");
 
 let __browser;
@@ -13,7 +13,7 @@ function setIntelligencesToFail(intelligence, err) {
   return intelligence;
 }
 
-async function headlessCrawler(intelligences, jobId, agentConfiguration) {
+async function headlessWorker(intelligences, jobId, agentConfiguration) {
   try {
     const configs = getConfigs();
     if (!__browser) {
@@ -87,7 +87,7 @@ async function headlessCrawler(intelligences, jobId, agentConfiguration) {
 
     return promises;
   } catch (err) {
-    logger.error(`headlessCrawler fail, error: ${err.message}`, {
+    logger.error(`headlessWorker fail, error: ${err.message}`, {
       jobId: jobId,
     });
     return [];
@@ -152,5 +152,5 @@ async function customFun(page, functionBody, intelligence) {
 }
 
 module.exports = {
-  headlessCrawler,
+  headlessWorker,
 };
