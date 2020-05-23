@@ -1,6 +1,9 @@
 const puppeteer = require("puppeteer");
 const _ = require("lodash");
-const logger = require("bitspider-agent-baseservice/lib/utils/logger");
+const path = require("path");
+const fs = require("fs");
+const logger = require("bitspider-agent-baseservice").logger;
+const publicFolder = require("bitspider-agent-baseservice").getPublic();
 const { getConfigs } = require("../utils");
 
 let __browser;
@@ -13,8 +16,36 @@ function setIntelligencesToFail(intelligence, err) {
   return intelligence;
 }
 
+async function screenshot(page, jobId, globalId) {
+  try {
+    const configs = getConfigs();
+    if (configs["SCREENSHOT"]) {
+      console.log(`jobId: ${jobId}, globalId: ${globalId}`);
+      let screenshotFolder = path.join(publicFolder, "screenshots", jobId);
+      if (!fs.existsSync(screenshotFolder)) {
+        fs.mkdirSync(screenshotFolder, { recursive: true });
+      }
+      let screenshotPath = path.join(screenshotFolder, `${globalId}.png`);
+      await page.screenshot({
+        fullPage: true,
+        path: screenshotPath,
+      });
+    }
+  } catch (error) {
+    logger.error(`screenshot fail. Error: ${error.message}`);
+  }
+}
+
 async function headlessWorker(intelligences, jobId, agentConfiguration) {
   try {
+    if(!intelligences||!intelligences.length){
+      if(__browser){
+        __browser.close();
+        __browser = undefined;
+      }
+      return [];
+    }
+
     const configs = getConfigs();
     if (!__browser) {
       const params = {
@@ -72,12 +103,14 @@ async function headlessWorker(intelligences, jobId, agentConfiguration) {
                 intelligence.system.state = "FINISHED";
                 intelligence.system.agent.endedAt = Date.now();
               }
+              await screenshot(page, jobId, _.get(intelligence, 'globalId'));
               resolve(intelligence);
             } catch (err) {
               logger.error(
                 `collect intelligence fail. globalId: ${intelligence.globalId}. Error: ${err.message}`
               );
               setIntelligencesToFail(intelligence, err);
+              await screenshot(page, jobId, _.get(intelligence, 'globalId'));
               reject(intelligence);
             }
           });

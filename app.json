@@ -24,6 +24,11 @@
       "description": "Winston logging level. Default is `info`, find detail from https://github.com/winstonjs/winston#logging-levels",
       "value": "info",
       "required": false
+    },
+    "SCREENSHOT": {
+      "description": "Catch screenshot of current page",
+      "value": false,
+      "required": false
     }
   },
   "success_url": "/",

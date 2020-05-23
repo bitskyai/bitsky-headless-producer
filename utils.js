@@ -26,6 +26,12 @@ function getConfigs() {
       configs.HEADLESS = true;
     }
 
+    if (process.env.SCREENSHOT === 'true' || process.env.SCREENSHOT === true) {
+      configs.SCREENSHOT = true;
+    } else {
+      configs.SCREENSHOT = false;
+    }
+
     if (!configs.MUNEW_BASE_URL) {
       console.warn(
         "You must set `MUNEW_BASE_URL` by `process.env.MUNEW_BASE_URL`. "
