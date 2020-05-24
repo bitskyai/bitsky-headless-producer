@@ -7,9 +7,10 @@ ENV REFRESHED_AT 2020-02-03
 # VNC port:5901
 # noVNC webport, connect via http://IP:6901/?password=welcome
 ENV DISPLAY=:1 \
-    # NO_VNC_PORT=6901 \
-    VNC_PORT=5901 
-EXPOSE $VNC_PORT $NO_VNC_PORT
+    NO_VNC_PORT=6901 \
+    VNC_PORT=5901 \
+    HEADLESS_PORT=8090
+EXPOSE $VNC_PORT $NO_VNC_PORT $HEADLESS_PORT
 
 ### Envrionment config
 ENV HOME=/munew \
@@ -27,10 +28,10 @@ WORKDIR $HOME
 
 ### Copy all install scripts for further steps
 COPY ./scripts/install/ ${INST_SCRIPTS}/
-COPY ./workers ${AGENT_DIR}/
+COPY ./workers ${AGENT_DIR}/workers/
 COPY ./index.js ${AGENT_DIR}/
 COPY ./package.json ${AGENT_DIR}/
-COPY ./utils.js ${AGENT_DIR}/
+COPY ./utils-docker.js ${AGENT_DIR}/utils.js
 COPY ./yarn.lock ${AGENT_DIR}/
 COPY ./README.md ${AGENT_DIR}/
 RUN find ${INST_SCRIPTS} -name '*.sh' -exec chmod a+x {} +
@@ -53,11 +54,11 @@ RUN ${INST_SCRIPTS}/chrome.sh
 RUN ${INST_SCRIPTS}/nodejs_yarn.sh
 
 ### Install only production node_modules
-RUN yarn --production=true
+RUN cd ${AGENT_DIR}/ && yarn --production=true
 
 ### Install xfce UI
 RUN ${INST_SCRIPTS}/xfce_ui.sh
-RUN ./scripts/xfce/ $HOME/
+COPY ./scripts/xfce/ $HOME/
 
 ### configure startup
 RUN ${INST_SCRIPTS}/libnss_wrapper.sh
