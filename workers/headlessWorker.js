@@ -21,11 +21,11 @@ async function screenshot(page, jobId, globalId) {
     const configs = getConfigs();
     if (configs["SCREENSHOT"]) {
       console.log(`jobId: ${jobId}, globalId: ${globalId}`);
-      let screenshotFolder = path.join(publicFolder, "screenshots", jobId);
+      let screenshotFolder = path.join(publicFolder, "screenshots");
       if (!fs.existsSync(screenshotFolder)) {
         fs.mkdirSync(screenshotFolder, { recursive: true });
       }
-      let screenshotPath = path.join(screenshotFolder, `${globalId}.png`);
+      let screenshotPath = path.join(screenshotFolder, `${Date.now()}-${globalId}.png`);
       await page.screenshot({
         fullPage: true,
         path: screenshotPath,

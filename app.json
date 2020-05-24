@@ -27,7 +27,7 @@
     },
     "SCREENSHOT": {
       "description": "Catch screenshot of current page",
-      "value": false,
+      "value": "false",
       "required": false
     }
   },
