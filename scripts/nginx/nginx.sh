@@ -35,14 +35,14 @@ http {
 
     # request start with /vnc, redirect to vnc server
     location ~* ^\/vnc$ {
-      return 301 /vnc/$1;
+      return 301 /vnc/\$1;
     }
     location ~* ^\/vnc(.+)$ {
-      proxy_pass http://127.0.0.1:6901$1;
+      proxy_pass http://127.0.0.1:6901\$1;
       include conf/proxy.conf;
     }
     location ~* ^\/websockify(.*)$ {
-      proxy_pass http://127.0.0.1:6901$1;
+      proxy_pass http://127.0.0.1:6901\$1;
       include conf/proxy.conf;
     }
 
