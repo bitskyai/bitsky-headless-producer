@@ -10,8 +10,8 @@ ENV DISPLAY=:1 \
     NO_VNC_PORT=6901 \
     VNC_PORT=5901 \
     HEADLESS_PORT=8090 \
-    PORT=8000
-EXPOSE $VNC_PORT $NO_VNC_PORT $HEADLESS_PORT $PORT
+    NGINX_PORT=80
+EXPOSE $VNC_PORT $NO_VNC_PORT $HEADLESS_PORT $NGINX_PORT
 
 ## Headless agent config
 ENV SCREENSHOT=false\
@@ -70,7 +70,7 @@ COPY ./scripts/xfce/ $HOME/
 ### configure startup
 RUN ${INST_SCRIPTS}/libnss_wrapper.sh
 COPY ./scripts/startup $STARTUPDIR
-RUN ${INST_SCRIPTS}/set_user_permission.sh $STARTUPDIR $HOME
+RUN ${INST_SCRIPTS}/set_user_permission.sh $STARTUPDIR $HOME $NGINX_DIR
 
 USER 0
 

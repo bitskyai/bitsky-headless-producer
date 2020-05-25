@@ -6,13 +6,7 @@ set -e
 help (){
 echo "
 USAGE:
-docker run -it -p 6901:6901 -p 5901:5901 consol/<image>:<tag> <option>
-
-IMAGES:
-consol/ubuntu-xfce-vnc
-consol/centos-xfce-vnc
-consol/ubuntu-icewm-vnc
-consol/centos-icewm-vnc
+docker run -it -p 5901:5901 -p 6901:6901 -p 8090:8090 -p 80:80 -e MUNEW_BASE_URL=<munew base url> -e GLOBAL_ID=<headless agent globalId> munew/agents-headless
 
 TAGS:
 latest  stable version of branch 'master'
@@ -21,12 +15,12 @@ dev     current development version of branch 'dev'
 OPTIONS:
 -w, --wait      (default) keeps the UI and the vncserver up until SIGINT or SIGTERM will received
 -s, --skip      skip the vnc startup and just execute the assigned command.
-                example: docker run consol/centos-xfce-vnc --skip bash
+                example: docker run munew/agents-headless --skip bash
 -d, --debug     enables more detailed startup output
-                e.g. 'docker run consol/centos-xfce-vnc --debug bash'
+                e.g. 'docker run munew/agents-headless --debug bash'
 -h, --help      print out this help
 
-Fore more information see: https://github.com/ConSol/docker-headless-vnc-container
+Fore more information see: https://github.com/munew/dia-agents-headless
 "
 }
 if [[ $1 =~ -h|--help ]]; then
@@ -58,6 +52,8 @@ trap cleanup SIGINT SIGTERM
 
 ## write correct window size to chrome properties
 $STARTUPDIR/chrome-init.sh
+# Generate nginx.conf
+$NGINX_DIR/nginx.sh
 $STARTUPDIR/nginx_startup.sh &
 $STARTUPDIR/headless_startup.sh &
 
