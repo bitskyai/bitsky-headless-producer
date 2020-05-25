@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 LABEL maintainer="Munew docker maintainers <help.munewio@gmail.com>"
 ENV REFRESHED_AT 2020-02-03
@@ -9,8 +9,9 @@ ENV REFRESHED_AT 2020-02-03
 ENV DISPLAY=:1 \
     NO_VNC_PORT=6901 \
     VNC_PORT=5901 \
-    HEADLESS_PORT=8090
-EXPOSE $VNC_PORT $NO_VNC_PORT $HEADLESS_PORT
+    HEADLESS_PORT=8090 \
+    PORT=80
+EXPOSE $VNC_PORT $NO_VNC_PORT $HEADLESS_PORT $PORT
 
 ### Envrionment config
 ENV HOME=/munew \
