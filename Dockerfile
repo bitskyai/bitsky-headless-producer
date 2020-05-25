@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 
 LABEL maintainer="Munew docker maintainers <help.munewio@gmail.com>"
 ENV REFRESHED_AT 2020-02-03
@@ -10,8 +10,12 @@ ENV DISPLAY=:1 \
     NO_VNC_PORT=6901 \
     VNC_PORT=5901 \
     HEADLESS_PORT=8090 \
-    PORT=80
+    PORT=8000
 EXPOSE $VNC_PORT $NO_VNC_PORT $HEADLESS_PORT $PORT
+
+## Headless agent config
+ENV SCREENSHOT=false\
+    HEADLESS=true
 
 ### Envrionment config
 ENV HOME=/munew \
@@ -19,6 +23,7 @@ ENV HOME=/munew \
     STARTUPDIR=/dockerstartup \
     AGENT_DIR=/munew/agent \
     INST_SCRIPTS=/munew/agent/scripts/install \
+    NGINX_DIR=/munew/agent/scripts/nginx \
     NO_VNC_HOME=/munew/noVNC \
     DEBIAN_FRONTEND=noninteractive \
     VNC_COL_DEPTH=24 \
@@ -29,6 +34,7 @@ WORKDIR $HOME
 
 ### Copy all install scripts for further steps
 COPY ./scripts/install/ ${INST_SCRIPTS}/
+COPY ./scripts/nginx/ ${NGINX_DIR}/
 COPY ./workers ${AGENT_DIR}/workers/
 COPY ./index.js ${AGENT_DIR}/
 COPY ./package.json ${AGENT_DIR}/
@@ -66,7 +72,7 @@ RUN ${INST_SCRIPTS}/libnss_wrapper.sh
 COPY ./scripts/startup $STARTUPDIR
 RUN ${INST_SCRIPTS}/set_user_permission.sh $STARTUPDIR $HOME
 
-USER 1000
+USER 0
 
 ENTRYPOINT ["/dockerstartup/vnc_startup.sh"]
 CMD ["--wait"]
