@@ -2,9 +2,7 @@ const puppeteer = require("puppeteer");
 const _ = require("lodash");
 const path = require("path");
 const fs = require("fs");
-const logger = require("bitspider-agent-baseservice").logger;
-const publicFolder = require("bitspider-agent-baseservice").getPublic();
-const { getConfigs } = require("../utils");
+const { getAgentConfigs } = require("../utils");
 
 let __browser;
 
@@ -16,37 +14,37 @@ function setIntelligencesToFail(intelligence, err) {
   return intelligence;
 }
 
-async function screenshot(page, jobId, globalId) {
+async function screenshot(page, jobId, globalId, screenshotFolder) {
   try {
-    const configs = getConfigs();
-    if (configs["SCREENSHOT"]) {
-      console.log(`jobId: ${jobId}, globalId: ${globalId}`);
-      let screenshotFolder = path.join(publicFolder, "screenshots");
-      if (!fs.existsSync(screenshotFolder)) {
-        fs.mkdirSync(screenshotFolder, { recursive: true });
-      }
-      let screenshotPath = path.join(screenshotFolder, `${Date.now()}-${globalId}.png`);
-      await page.screenshot({
-        fullPage: true,
-        path: screenshotPath,
-      });
+    if (!fs.existsSync(screenshotFolder)) {
+      fs.mkdirSync(screenshotFolder, { recursive: true });
     }
+    let screenshotPath = path.join(
+      screenshotFolder,
+      `${Date.now()}-${globalId}.png`
+    );
+    await page.screenshot({
+      fullPage: true,
+      path: screenshotPath,
+    });
   } catch (error) {
-    logger.error(`screenshot fail. Error: ${error.message}`);
+    logger.error(`screenshot fail. Error: ${error.message}`, { jobId });
   }
 }
 
-async function headlessWorker(intelligences, jobId, agentConfiguration) {
+async function headlessWorker(options) {
+  const jobId = _.get(options, "jobId");
+  const logger = _.get(options, "context.logger");
+  const intelligences = _.get(options, "intelligences");
   try {
-    if(!intelligences||!intelligences.length){
-      if(__browser){
+    if (!intelligences || !intelligences.length) {
+      if (__browser) {
         __browser.close();
         __browser = undefined;
       }
       return [];
     }
-
-    const configs = getConfigs();
+    const configs = options.context.baseservice.getConfigs();
     if (!__browser) {
       const params = {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -55,6 +53,17 @@ async function headlessWorker(intelligences, jobId, agentConfiguration) {
       };
       __browser = await puppeteer.launch(params);
     }
+    let screenshotFolder;
+    if (configs["SCREENSHOT_FOLDER"]) {
+      screenshotFolder = configs["SCREENSHOT_FOLDER"];
+    } else {
+      let publicFolder = _.get(
+        options,
+        "context.baseservice.getDefaultPublic()"
+      );
+      screenshotFolder = path.join(publicFolder, "screenshots");
+    }
+
     let pages = await __browser.pages();
     const promises = [];
     for (let i = 0; i < intelligences.length; i++) {
@@ -103,14 +112,28 @@ async function headlessWorker(intelligences, jobId, agentConfiguration) {
                 intelligence.system.state = "FINISHED";
                 intelligence.system.agent.endedAt = Date.now();
               }
-              await screenshot(page, jobId, _.get(intelligence, 'globalId'));
+              if (configs["SCREENSHOT"]) {
+                await screenshot(
+                  page,
+                  jobId,
+                  _.get(intelligence, "globalId"),
+                  screenshotFolder
+                );
+              }
               resolve(intelligence);
             } catch (err) {
               logger.error(
                 `collect intelligence fail. globalId: ${intelligence.globalId}. Error: ${err.message}`
               );
               setIntelligencesToFail(intelligence, err);
-              await screenshot(page, jobId, _.get(intelligence, 'globalId'));
+              if (configs["SCREENSHOT"]) {
+                await screenshot(
+                  page,
+                  jobId,
+                  _.get(intelligence, "globalId"),
+                  screenshotFolder
+                );
+              }
               reject(intelligence);
             }
           });
@@ -138,7 +161,7 @@ async function headlessWorker(intelligences, jobId, agentConfiguration) {
  */
 async function customFun(page, functionBody, intelligence) {
   try {
-    const configs = getConfigs();
+    const configs = getAgentConfigs();
     const dataset = await page.evaluate(
       function (intelligence, functionBody, TIMEOUT) {
         return new Promise((resolve, reject) => {
