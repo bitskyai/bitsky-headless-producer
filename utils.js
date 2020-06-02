@@ -11,10 +11,6 @@ function getAgentConfigs() {
         process.env.CUSTOM_FUNCTION_TIMEOUT || 1 * 60 * 1000, // Timeout value for a customFun call
     };
 
-    if (process.env.SCREENSHOT_FOLDER) {
-      configs.SCREENSHOT_FOLDER = process.env.SCREENSHOT_FOLDER;
-    }
-
     if(process.env.AGENT_HOME){
       configs.AGENT_HOME = process.env.AGENT_HOME;
     }

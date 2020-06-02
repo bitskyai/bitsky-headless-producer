@@ -54,8 +54,8 @@ async function headlessWorker(options) {
       __browser = await puppeteer.launch(params);
     }
     let screenshotFolder;
-    if (configs["SCREENSHOT_FOLDER"]) {
-      screenshotFolder = configs["SCREENSHOT_FOLDER"];
+    if (configs["AGENT_HOME"]) {
+      screenshotFolder = path.join(configs["AGENT_HOME"], "screenshots");
     } else {
       let publicFolder = _.get(
         options,
