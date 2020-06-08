@@ -3,7 +3,7 @@ const _ = require("lodash");
 const { headlessWorker } = require("./workers/headlessWorker");
 const { getAgentConfigs } = require("./utils");
 
-let server = undefined;
+let __baseservice = undefined;
 
 module.exports = {
   startServer: async function startServer(
@@ -16,20 +16,26 @@ module.exports = {
       const defaultConfigs = getAgentConfigs();
       // merge with customer configs
       configs = _.merge({}, defaultConfigs, configs);
-      const baseservice = new Baseservice(configs);
+      let baseservice = __baseservice;
+      if(!baseservice){
+        baseservice = new Baseservice(configs);
+        __baseservice = baseservice;
+      }
       baseservice.express(exprssOptions || {});
       baseservice.type("HEADLESSBROWSER");
       baseservice.worker(headlessWorker);
       baseservice.routers(indexOptions || {});
-      server = baseservice.listen();
+      await baseservice.listen();
     } catch (err) {
       throw err;
     }
   },
   stopServer: async function stopServer() {
     try {
-      server.destroy();
-      server = undefined;
+      if(__baseservice.server){
+        __baseservice.server.destroy();
+      }
+      __baseservice.server = undefined;
     } catch (err) {
       throw err;
     }
