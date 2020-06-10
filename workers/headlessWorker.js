@@ -39,7 +39,7 @@ async function headlessWorker(options) {
   try {
     if (!intelligences || !intelligences.length) {
       if (__browser) {
-        __browser.close();
+        await __browser.close();
         __browser = undefined;
       }
       return [];
@@ -209,6 +209,14 @@ async function customFun(page, functionBody, intelligence) {
   }
 }
 
+async function resetHeadlessWorker() {
+  if (__browser) {
+    await __browser.close();
+    __browser = undefined;
+  }
+}
+
 module.exports = {
   headlessWorker,
+  resetHeadlessWorker,
 };

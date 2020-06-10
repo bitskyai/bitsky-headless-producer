@@ -1,6 +1,6 @@
 const Baseservice = require("bitspider-agent-baseservice");
 const _ = require("lodash");
-const { headlessWorker } = require("./workers/headlessWorker");
+const { headlessWorker, resetHeadlessWorker } = require("./workers/headlessWorker");
 const { getAgentConfigs } = require("./utils");
 
 let __baseservice = undefined;
@@ -12,29 +12,27 @@ module.exports = {
     indexOptions
   ) {
     try {
+      await resetHeadlessWorker();
       // get default configurations
       const defaultConfigs = getAgentConfigs();
       // merge with customer configs
       configs = _.merge({}, defaultConfigs, configs);
-      let baseservice = __baseservice;
-      baseservice = new Baseservice(configs);
-      __baseservice = baseservice;
-      baseservice.setConfigs(configs);
-      baseservice.express(exprssOptions || {});
-      baseservice.type("HEADLESSBROWSER");
-      baseservice.worker(headlessWorker);
-      baseservice.routers(indexOptions || {});
-      await baseservice.listen();
+       __baseservice = new Baseservice(configs);
+       __baseservice.setConfigs(configs);
+       __baseservice.express(exprssOptions || {});
+       __baseservice.type("HEADLESSBROWSER");
+       __baseservice.worker(headlessWorker);
+       __baseservice.routers(indexOptions || {});
+      await __baseservice.listen();
     } catch (err) {
       throw err;
     }
   },
   stopServer: async function stopServer() {
     try {
-      if(__baseservice.server){
-        __baseservice.server.destroy();
-      }
-      __baseservice.server = undefined;
+      await __baseservice.stop();
+      await resetHeadlessWorker();
+      __baseservice = undefined;
     } catch (err) {
       throw err;
     }
