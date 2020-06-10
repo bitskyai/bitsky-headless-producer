@@ -17,10 +17,9 @@ module.exports = {
       // merge with customer configs
       configs = _.merge({}, defaultConfigs, configs);
       let baseservice = __baseservice;
-      if(!baseservice){
-        baseservice = new Baseservice(configs);
-        __baseservice = baseservice;
-      }
+      baseservice = new Baseservice(configs);
+      __baseservice = baseservice;
+      baseservice.setConfigs(configs);
       baseservice.express(exprssOptions || {});
       baseservice.type("HEADLESSBROWSER");
       baseservice.worker(headlessWorker);

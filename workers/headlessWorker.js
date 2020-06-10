@@ -14,7 +14,7 @@ function setIntelligencesToFail(intelligence, err) {
   return intelligence;
 }
 
-async function screenshot(page, jobId, globalId, screenshotFolder) {
+async function screenshot(page, jobId, globalId, screenshotFolder, logger) {
   try {
     if (!fs.existsSync(screenshotFolder)) {
       fs.mkdirSync(screenshotFolder, { recursive: true });
@@ -117,7 +117,8 @@ async function headlessWorker(options) {
                   page,
                   jobId,
                   _.get(intelligence, "globalId"),
-                  screenshotFolder
+                  screenshotFolder,
+                  logger
                 );
               }
               resolve(intelligence);
@@ -131,7 +132,8 @@ async function headlessWorker(options) {
                   page,
                   jobId,
                   _.get(intelligence, "globalId"),
-                  screenshotFolder
+                  screenshotFolder,
+                  logger
                 );
               }
               reject(intelligence);
