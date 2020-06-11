@@ -122,10 +122,10 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.0.0.tgz#23c0df14f6a88077f5f986c0d167ec03c3d5537c"
   integrity sha512-Phlt0plgpIIBOGTT/ehfFnbNlfsDEiqmzE2KRXoX1bLIlir4X/MR+zSyBEkL05ffWgnRSf/DXv+WrUAVr93/ow==
 
-bitspider-agent-baseservice@0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/bitspider-agent-baseservice/-/bitspider-agent-baseservice-0.3.1.tgz#11ff1b6f6dbf13a9c33949640cfdca34907c0ba1"
-  integrity sha512-D1oda/iEnM7BIE3HCEBUUN9LDpXQeWdNuWOveUFeJpC6ubq+dvlDT+SMBVftsQCuKR1kdVZCxAGNiauuyogQBw==
+bitspider-agent-baseservice@0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/bitspider-agent-baseservice/-/bitspider-agent-baseservice-0.3.2.tgz#30ae20838950439ccfeda0072f880a59dc5b419e"
+  integrity sha512-/P2rA1M9YBp19CvzzmDhzn0d1Tpw8UCsNEdALdR03iJ63P0v7812deLaoN+tXvGXHcp+1b4qblhTgaNavOgS3g==
   dependencies:
     axios "0.19.2"
     cookie-parser "1.4.5"

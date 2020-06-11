@@ -16,6 +16,9 @@ function setIntelligencesToFail(intelligence, err) {
 
 async function screenshot(page, jobId, globalId, screenshotFolder, logger) {
   try {
+    logger.debug(`screenshot -> screenshotFolder: ${screenshotFolder}`, {
+      jobId,
+    });
     if (!fs.existsSync(screenshotFolder)) {
       fs.mkdirSync(screenshotFolder, { recursive: true });
     }
@@ -23,13 +26,29 @@ async function screenshot(page, jobId, globalId, screenshotFolder, logger) {
       screenshotFolder,
       `${Date.now()}-${globalId}.png`
     );
+    logger.debug(`screenshot -> screenshotPath: ${screenshotPath}`, {
+      jobId,
+    });
     await page.screenshot({
       fullPage: true,
       path: screenshotPath,
     });
-  } catch (error) {
-    logger.error(`screenshot fail. Error: ${error.message}`, { jobId });
+    logger.debug(
+      `Capture screenshot success. screenshotPath: ${screenshotPath}`,
+      {
+        jobId,
+      }
+    );
+  } catch (err) {
+    logger.error(`Capture screenshot fail. Error: ${err.message}`, {
+      jobId,
+      error: err,
+    });
   }
+}
+
+function getChromiumExecPath() {
+  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
 }
 
 async function headlessWorker(options) {
@@ -39,6 +58,7 @@ async function headlessWorker(options) {
   try {
     if (!intelligences || !intelligences.length) {
       if (__browser) {
+        logger.debug(`intelligences length is ${intelligences.length}`);
         await __browser.close();
         __browser = undefined;
       }
@@ -46,12 +66,19 @@ async function headlessWorker(options) {
     }
     const configs = options.context.baseservice.getConfigs();
     if (!__browser) {
+      logger.debug(`browser isn't inited. headless: ${configs["HEADLESS"]}`, {
+        jobId: jobId,
+      });
       const params = {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         headless: configs["HEADLESS"],
         defaultViewport: null,
+        executablePath: getChromiumExecPath()
       };
       __browser = await puppeteer.launch(params);
+      logger.debug(`Puppeteer launch browser successful`, {
+        jobId: jobId,
+      });
     }
     let screenshotFolder;
     if (configs["AGENT_HOME"]) {
@@ -63,6 +90,10 @@ async function headlessWorker(options) {
       );
       screenshotFolder = path.join(publicFolder, "screenshots");
     }
+
+    logger.debug(`screenshotFolder: ${screenshotFolder}`, {
+      jobId: jobId,
+    });
 
     let pages = await __browser.pages();
     const promises = [];
@@ -76,6 +107,9 @@ async function headlessWorker(options) {
               if (!page) {
                 page = await __browser.newPage();
               }
+              logger.debug(`intelligence URL: ${intelligence.url}`, {
+                jobId: jobId,
+              });
               await page.goto(intelligence.url);
               let functionBody = "";
               // Check whether this intelligence need to execute custom script
@@ -88,30 +122,63 @@ async function headlessWorker(options) {
               }
               if (functionBody) {
                 // if it has custom function, then in custom function will return collected intelligence
-                let dataset = await customFun(page, functionBody, intelligence);
+                logger.debug(`Start run custom function.`, {
+                  jobId: jobId,
+                });
+                let dataset;
+                try {
+                  dataset = await customFun(page, functionBody, intelligence);
+                } catch (err) {
+                  // by design, when throw error or reject, both will return an Error object
+                  dataset = err;
+                }
                 if (dataset instanceof Error) {
-                  setIntelligencesToFail(intelligence, err);
+                  logger.debug(
+                    `Evaluate customFun fail. Error: ${dataset.message}`,
+                    {
+                      jobId: jobId,
+                      error: dataset,
+                    }
+                  );
+                  setIntelligencesToFail(intelligence, dataset);
                 } else {
+                  logger.debug(`Evaluate customFun success.`, {
+                    jobId: jobId,
+                  });
                   // also update intelligence state
                   intelligence.system.state = "FINISHED";
                   intelligence.system.agent.endedAt = Date.now();
                   intelligence.dataset = dataset;
                 }
               } else {
-                // otherwise default collect currently page
-                const content = await page.$eval("html", (elem) => {
-                  return elem && elem.innerHTML;
+                logger.debug(`No customFun`, {
+                  jobId: jobId,
                 });
-                intelligence.dataset = {
-                  url: page.url(),
-                  data: {
-                    contentType: "html",
-                    content: content,
-                  },
-                };
-                intelligence.system.state = "FINISHED";
-                intelligence.system.agent.endedAt = Date.now();
+                // otherwise default collect currently page
+                try {
+                  const content = await page.$eval("html", (elem) => {
+                    return elem && elem.innerHTML;
+                  });
+                  intelligence.dataset = {
+                    url: page.url(),
+                    data: {
+                      contentType: "html",
+                      content: content,
+                    },
+                  };
+                  intelligence.system.state = "FINISHED";
+                  intelligence.system.agent.endedAt = Date.now();
+                  logger.debug(`Execute intelligence successful `, {
+                    jobId: jobId,
+                  });
+                } catch (err) {
+                  setIntelligencesToFail(intelligence, err);
+                  logger.debug(`Execute intelligence fail`, {
+                    jobId: jobId,
+                  });
+                }
               }
+
               if (configs["SCREENSHOT"]) {
                 await screenshot(
                   page,
@@ -121,6 +188,9 @@ async function headlessWorker(options) {
                   logger
                 );
               }
+              logger.debug(`Execute intlligence - ${intelligence.globalId} successful`, {
+                jobId: jobId,
+              });
               resolve(intelligence);
             } catch (err) {
               logger.error(
@@ -147,6 +217,7 @@ async function headlessWorker(options) {
   } catch (err) {
     logger.error(`headlessWorker fail, error: ${err.message}`, {
       jobId: jobId,
+      error: err,
     });
     return [];
   }
@@ -189,6 +260,10 @@ async function customFun(page, functionBody, intelligence) {
               reject(new Error("customFun evaluate timeout"));
             }, TIMEOUT);
           } catch (err) {
+            // if it isn't an error object, then create an error object
+            if (!(err instanceof Error)) {
+              err = new Error(err);
+            }
             reject(err);
           }
         });
@@ -202,9 +277,10 @@ async function customFun(page, functionBody, intelligence) {
     }
     return dataset;
   } catch (err) {
-    // logger.info(
-    //   `customFun fail. intelligence globalId: ${intelligence.globalId}. Error: ${err.message}`
-    // );
+    // if it isn't an error object, then create an error object
+    if (!(err instanceof Error)) {
+      err = new Error(err);
+    }
     throw err;
   }
 }
