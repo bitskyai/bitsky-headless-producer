@@ -1,6 +1,6 @@
 {
   "name": "dia-agents-headless",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "./index.js",
   "author": "help.munewio@gmail.com",
   "license": "Apache-2.0",
@@ -12,7 +12,7 @@
     "debug": "ndb ./index.js"
   },
   "dependencies": {
-    "bitspider-agent-baseservice": "0.3.2",
+    "bitspider-agent-baseservice": "0.3.3",
     "puppeteer": "3.0.4",
     "lodash": "4.17.15"
   },
