@@ -48,7 +48,7 @@ async function screenshot(page, jobId, globalId, screenshotFolder, logger) {
 }
 
 function getChromiumExecPath() {
-  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
+  return puppeteer.executablePath().replace("app.asar", "app.asar.unpacked");
 }
 
 async function headlessWorker(options) {
@@ -69,18 +69,72 @@ async function headlessWorker(options) {
       logger.debug(`browser isn't inited. headless: ${configs["HEADLESS"]}`, {
         jobId: jobId,
       });
-      let executablePath = _.get(configs, 'PUPPETEER_EXECUTABLE_PATH');
-      if(executablePath === 'undefined' || executablePath === 'null' || executablePath === ''){
+      let executablePath = _.get(configs, "PUPPETEER_EXECUTABLE_PATH");
+      if (
+        executablePath === "undefined" ||
+        executablePath === "null" ||
+        executablePath === ""
+      ) {
         executablePath = getChromiumExecPath();
+      }
+
+      let userDataDir = _.get(configs, "PUPPETEER_USER_DATA_DIR");
+      if (
+        userDataDir === "undefined" ||
+        userDataDir === "null" ||
+        userDataDir === ""
+      ) {
+        userDataDir = undefined;
+      }
+
+      let args = ["--no-sandbox", "--disable-setuid-sandbox"];
+      let ignoreDefaultArgs = false;
+      if (userDataDir) {
+        // args = [
+        //   "--disable-background-networking",
+        //   "--enable-features=NetworkService,NetworkServiceInProcess",
+        //   "--disable-background-timer-throttling",
+        //   "--disable-backgrounding-occluded-windows",
+        //   "--disable-breakpad",
+        //   "--disable-client-side-phishing-detection",
+        //   "--disable-component-extensions-with-background-pages",
+        //   "--disable-default-apps",
+        //   "--disable-dev-shm-usage",
+        //   "--disable-features=TranslateUI",
+        //   "--disable-hang-monitor",
+        //   "--disable-ipc-flooding-protection",
+        //   "--disable-popup-blocking",
+        //   "--disable-prompt-on-repost",
+        //   "--disable-renderer-backgrounding",
+        //   "--disable-sync",
+        //   "--metrics-recording-only",
+        //   "--enable-automation",
+        //   "--no-first-run",
+        //   "--no-sandbox",
+        //   "--disable-setuid-sandbox",
+        //   "--flag-switches-begin",
+        //   "--flag-switches-end",
+        //   "--enable-audio-service-sandbox",
+        //   `--user-data-dir=${userDataDir}`,
+        // ];
+        args = [
+          "--no-first-run",
+          "--flag-switches-begin",
+          "--flag-switches-end",
+          "--enable-audio-service-sandbox",
+          `--user-data-dir=${userDataDir}`,
+        ];
+        ignoreDefaultArgs = true;
       }
 
       logger.debug(`Chrome Executeable Path: ${executablePath}`);
       console.log(`Chrome Executeable Path: ${executablePath}`);
       const params = {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: _.get(configs, 'HEADLESS'),
+        args: args,
+        ignoreDefaultArgs,
+        headless: _.get(configs, "HEADLESS"),
         defaultViewport: null,
-        executablePath
+        executablePath,
       };
       __browser = await puppeteer.launch(params);
       logger.debug(`Puppeteer launch browser successful`, {
@@ -195,9 +249,12 @@ async function headlessWorker(options) {
                   logger
                 );
               }
-              logger.debug(`Execute intlligence - ${intelligence.globalId} successful`, {
-                jobId: jobId,
-              });
+              logger.debug(
+                `Execute intlligence - ${intelligence.globalId} successful`,
+                {
+                  jobId: jobId,
+                }
+              );
               resolve(intelligence);
             } catch (err) {
               logger.error(
