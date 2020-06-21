@@ -69,11 +69,18 @@ async function headlessWorker(options) {
       logger.debug(`browser isn't inited. headless: ${configs["HEADLESS"]}`, {
         jobId: jobId,
       });
+      let executablePath = _.get(configs, 'PUPPETEER_EXECUTABLE_PATH');
+      if(executablePath === 'undefined' || executablePath === 'null' || executablePath === ''){
+        executablePath = getChromiumExecPath();
+      }
+
+      logger.debug(`Chrome Executeable Path: ${executablePath}`);
+      console.log(`Chrome Executeable Path: ${executablePath}`);
       const params = {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: configs["HEADLESS"],
+        headless: _.get(configs, 'HEADLESS'),
         defaultViewport: null,
-        executablePath: getChromiumExecPath()
+        executablePath
       };
       __browser = await puppeteer.launch(params);
       logger.debug(`Puppeteer launch browser successful`, {

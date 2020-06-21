@@ -15,6 +15,10 @@ function getAgentConfigs() {
       configs.AGENT_HOME = process.env.AGENT_HOME;
     }
 
+    if(process.env.PUPPETEER_EXECUTABLE_PATH){
+      configs.PUPPETEER_EXECUTABLE_PATH = process.env.PUPPETEER_EXECUTABLE_PATH;
+    }
+
     if (process.env.HEADLESS === "false" || process.env.HEADLESS === false) {
       configs.HEADLESS = false;
     } else {
