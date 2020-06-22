@@ -118,17 +118,20 @@ async function headlessWorker(options) {
         //   `--user-data-dir=${userDataDir}`,
         // ];
         args = [
+          "--disable-breakpad",
           "--no-first-run",
           "--flag-switches-begin",
           "--flag-switches-end",
           "--enable-audio-service-sandbox",
           `--user-data-dir=${userDataDir}`,
         ];
+        if(_.get(configs, "HEADLESS")){
+          args.push("--headless");
+        }
         ignoreDefaultArgs = true;
       }
 
       logger.debug(`Chrome Executeable Path: ${executablePath}`);
-      console.log(`Chrome Executeable Path: ${executablePath}`);
       const params = {
         args: args,
         ignoreDefaultArgs,

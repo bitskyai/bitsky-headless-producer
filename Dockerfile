@@ -38,6 +38,7 @@ COPY ./scripts/nginx/ ${NGINX_DIR}/
 COPY ./workers ${AGENT_DIR}/workers/
 COPY ./index.js ${AGENT_DIR}/
 COPY ./package.json ${AGENT_DIR}/
+COPY ./agentConfigs.js ${AGENT_DIR}/agentConfigs.js
 COPY ./utils-docker.js ${AGENT_DIR}/utils.js
 COPY ./yarn.lock ${AGENT_DIR}/
 COPY ./README.md ${AGENT_DIR}/
