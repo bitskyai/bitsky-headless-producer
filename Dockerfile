@@ -1,88 +1,84 @@
-FROM ubuntu:18.04
+FROM alpine:3.12.0
 
 LABEL maintainer="Munew docker maintainers <help.munewio@gmail.com>"
-ENV REFRESHED_AT 2020-02-03
+ENV REFRESHED_AT 2020-06-27
 
-## Connection ports for controlling the UI:
-# VNC port:5901
-# noVNC webport, connect via http://IP:6901/?password=welcome
-ENV DISPLAY=:1 \
-    NO_VNC_PORT=6901 \
-    VNC_PORT=5901 \
-    HEADLESS_PORT=8090 \
-    NGINX_PORT=80
-EXPOSE $VNC_PORT $NO_VNC_PORT $HEADLESS_PORT $NGINX_PORT
+# Make sure all the user has same environment
+COPY alpine/config /etc/skel/.config
 
-## Headless agent config
-ENV SCREENSHOT=false\
-    HEADLESS=true
+# Installs latest Chromium package.
+RUN set -xe \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/v3.11/main" >> /etc/apk/repositories \
+    && apk upgrade -U -a \
+    && apk add --no-cache \
+    xvfb \
+    x11vnc \ 
+    xfce4 \ 
+    xfce4-terminal \ 
+    paper-icon-theme \
+    arc-theme \
+    libstdc++ \
+    python \
+    chromium \
+    harfbuzz \
+    nss \
+    freetype \
+    ttf-freefont \
+    wqy-zenhei \
+    bash \
+    sudo \
+    htop \
+    procps \
+    curl \
+    && rm -rf /var/cache/* \
+    && mkdir /var/cache/apk
 
-### Envrionment config
-ENV HOME=/munew \
+RUN set -xe \
+  # && echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing"  >> /etc/apk/repositories \
+  # && apk --update --no-cache add xvfb x11vnc@testing xfce4 xfce4-terminal paper-icon-theme arc-theme@testing chromium python bash sudo htop procps curl \
+  && mkdir -p /usr/share/wallpapers \
+  && echo "CHROMIUM_FLAGS=\"--disable-dev-shm-usage --no-sandbox --disable-gpu-sandbox --disable-gpu --user-data-dir --window-position=0,0\"" >> /etc/chromium/chromium.conf \
+  && addgroup alpine \
+  && adduser -G alpine -s /bin/bash -D alpine \
+  && echo "alpine:alpine" | /usr/sbin/chpasswd \
+  && echo "alpine ALL=NOPASSWD: ALL" >> /etc/sudoers \
+  && apk del curl 
+
+COPY alpine/bk-the-milk-way.jpg /usr/share/wallpapers/
+
+USER alpine
+
+ENV USER=alpine \
+    DISPLAY=:1 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    HOME=/home/alpine \
     TERM=xterm \
-    STARTUPDIR=/dockerstartup \
-    AGENT_DIR=/munew/agent \
-    INST_SCRIPTS=/munew/agent/scripts/install \
-    NGINX_DIR=/munew/agent/scripts/nginx \
-    NO_VNC_HOME=/munew/noVNC \
-    DEBIAN_FRONTEND=noninteractive \
-    VNC_COL_DEPTH=24 \
+    SHELL=/bin/bash \
+    VNC_PASSWD=alpinelinux \
+    VNC_PORT=5900 \
     VNC_RESOLUTION=1024x768 \
-    VNC_PW=welcome \
-    VNC_VIEW_ONLY=false
+    VNC_COL_DEPTH=24  \
+    NOVNC_PORT=6080 \
+    NOVNC_HOME=/home/alpine/noVNC 
+
+RUN set -xe \
+  && sudo apk update \
+  # && sudo apk add ca-certificates wget \
+  # && sudo update-ca-certificates \
+  && mkdir -p $NOVNC_HOME/utils/websockify \
+  && wget -qO- https://github.com/novnc/noVNC/archive/v1.1.0.tar.gz | tar xz --strip 1 -C $NOVNC_HOME \
+  && wget -qO- https://github.com/novnc/websockify/archive/v0.9.0.tar.gz | tar xzf - --strip 1 -C $NOVNC_HOME/utils/websockify \
+  && chmod +x -v $NOVNC_HOME/utils/*.sh \
+  && ln -s $NOVNC_HOME/vnc_lite.html $NOVNC_HOME/index.html \
+  && sudo apk del wget
+
 WORKDIR $HOME
+EXPOSE $VNC_PORT $NOVNC_PORT
 
-### Copy all install scripts for further steps
-COPY ./scripts/install/ ${INST_SCRIPTS}/
-COPY ./scripts/nginx/ ${NGINX_DIR}/
-COPY ./workers ${AGENT_DIR}/workers/
-COPY ./index.js ${AGENT_DIR}/
-COPY ./package.json ${AGENT_DIR}/
-COPY ./agentConfigs.js ${AGENT_DIR}/agentConfigs.js
-COPY ./utils-docker.js ${AGENT_DIR}/utils.js
-COPY ./yarn.lock ${AGENT_DIR}/
-COPY ./README.md ${AGENT_DIR}/
-RUN find ${INST_SCRIPTS} -name '*.sh' -exec chmod a+x {} +
+COPY alpine/run_novnc /usr/bin/
 
-### Install some common tools
-RUN ${INST_SCRIPTS}/tools.sh
-ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
-
-### Install custom fonts
-RUN ${INST_SCRIPTS}/install_custom_fonts.sh
-
-### Install xvnc-server & noVNC - HTML5 based VNC viewer
-RUN ${INST_SCRIPTS}/tigervnc.sh
-RUN ${INST_SCRIPTS}/no_vnc.sh
-
-### Install firefox and chrome browser
-RUN ${INST_SCRIPTS}/chrome.sh
-
-### Install NodeJS and Yarn
-RUN ${INST_SCRIPTS}/nodejs_yarn.sh
-
-### Install only production node_modules
-RUN cd ${AGENT_DIR}/ && yarn --production=true
-
-### Install xfce UI
-RUN ${INST_SCRIPTS}/xfce_ui.sh
-COPY ./scripts/xfce/ $HOME/
-
-### configure startup
-RUN ${INST_SCRIPTS}/libnss_wrapper.sh
-COPY ./scripts/startup $STARTUPDIR
-RUN ${INST_SCRIPTS}/set_user_permission.sh $STARTUPDIR $HOME $NGINX_DIR
-
-USER 0
-
-ENTRYPOINT ["/dockerstartup/vnc_startup.sh"]
-CMD ["--wait"]
-
-
-# Metadata
-LABEL munew.image.vendor="Munew" \
-    munew.image.url="https://munew.io" \
-    munew.image.title="Munew Headless Agent" \
-    munew.image.description="Response for collect intelligence data and send back to Analyst Service." \
-    munew.image.version="v0.1.1" \
-    munew.image.documentation="https://docs.munew.io"
+CMD ["run_novnc"]
