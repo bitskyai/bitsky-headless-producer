@@ -129,11 +129,14 @@ RUN cd ${AGENT_DIR}/ && yarn --production=true
 
 COPY alpine/startup $STARTUPDIR
 # RUN ${INST_SCRIPTS}/set_user_permission.sh $STARTUPDIR $HOME $NGINX_DIR
-RUN chown -R alpine:alpine $STARTUPDIR \
-  && chown -R alpine:alpine $HOME \
-  && chown -R alpine:alpine $NGINX_DIR
+# RUN chown -R alpine:alpine $STARTUPDIR \
+#   && chown -R alpine:alpine $HOME \
+#   && chown -R alpine:alpine $NGINX_DIR
 
-USER alpine
+# USER alpine
+
+# tmp swith to root user, otherwise cannot start nginx in heroku env
+USER 0
 
 ENTRYPOINT ["/dockerstartup/vnc_startup.sh"]
 CMD ["--wait"]

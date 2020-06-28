@@ -1,6 +1,11 @@
+#!/bin/bash
+set -e
+
 if [ -z "${PORT}" ]; then
   PORT="${NGINX_PORT}"
 fi
+
+echo "PORT: ${PORT}"
 
 NGINX_CONFIG="
 worker_processes auto;
@@ -58,3 +63,5 @@ http {
 echo "$NGINX_CONFIG" > ${NGINX_DIR}/nginx.conf
 
 echo "generate nginx.conf to ${NGINX_DIR}/nginx.conf"
+
+cat ${NGINX_DIR}/nginx.conf
