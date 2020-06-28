@@ -64,7 +64,8 @@ async function headlessWorker(options) {
       }
       return [];
     }
-    const configs = options.context.baseservice.getConfigs();
+    const baseservice = _.get(options, "context.baseservice");
+    const configs = baseservice.getConfigs();
     if (!__browser) {
       logger.debug(`browser isn't inited. headless: ${configs["HEADLESS"]}`, {
         jobId: jobId,
@@ -150,10 +151,7 @@ async function headlessWorker(options) {
     if (configs["AGENT_HOME"]) {
       screenshotFolder = path.join(configs["AGENT_HOME"], "screenshots");
     } else {
-      let publicFolder = _.get(
-        options,
-        "context.baseservice.getDefaultPublic()"
-      );
+      const publicFolder = baseservice.getDefaultPublic();
       screenshotFolder = path.join(publicFolder, "screenshots");
     }
 
