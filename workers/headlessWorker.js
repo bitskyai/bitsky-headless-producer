@@ -118,10 +118,12 @@ async function headlessWorker(options) {
         //   `--user-data-dir=${userDataDir}`,
         // ];
         args = [
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
           "--disable-breakpad",
           "--no-first-run",
-          "--flag-switches-begin",
-          "--flag-switches-end",
+          // "--flag-switches-begin",
+          // "--flag-switches-end",
           "--enable-audio-service-sandbox",
           `--user-data-dir=${userDataDir}`,
         ];

@@ -2,4 +2,4 @@
 ### every exit != 0 fails the script
 set -e
 
-nginx -c ${NGINX_DIR}/nginx.conf
+sudo nginx -c ${NGINX_DIR}/nginx.conf

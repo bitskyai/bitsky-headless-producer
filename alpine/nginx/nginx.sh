@@ -38,17 +38,17 @@ http {
       return 301 /vnc/\$1;
     }
     location ~* ^\/vnc(.+)$ {
-      proxy_pass http://127.0.0.1:6901\$1;
+      proxy_pass http://127.0.0.1:${NOVNC_PORT}\$1;
       include conf/proxy.conf;
     }
     location ~* ^\/websockify(.*)$ {
-      proxy_pass http://127.0.0.1:6901\$1;
+      proxy_pass http://127.0.0.1:${NOVNC_PORT}\$1;
       include conf/proxy.conf;
     }
 
     # by default proxy to headless server
     location / {
-      proxy_pass http://127.0.0.1:8090;
+      proxy_pass http://127.0.0.1:${HEADLESS_PORT};
       include conf/proxy.conf;
     }
   }
@@ -56,3 +56,5 @@ http {
 "
 
 echo "$NGINX_CONFIG" > ${NGINX_DIR}/nginx.conf
+
+echo "generate nginx.conf to ${NGINX_DIR}/nginx.conf"
