@@ -17,7 +17,11 @@
       "required": true
     },
     "GLOBAL_ID": {
-      "description": "Your headless agent's globalID. ",
+      "description": "Global ID of the headless agent you want to connect. Example: YWdlbnQ6OjE1OTMwNjYzODY5MDU6OmU3MjAwZmU5LWViZTktNDc3Zi1hMDY1LTEzYjFiOTQ3YTAyMQ==",
+      "required": true
+    },
+    "AGENT_SERIAL_ID": {
+      "description": "An UUID to idenity this agent, better you keep same value for this agent. Example: b7f6a100-9a35-4df3-bef9-2c1f6d8c866e",
       "required": true
     },
     "LOG_LEVEL": {
