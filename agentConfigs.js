@@ -9,6 +9,7 @@ function getConfigs() {
       // otherwise, keep it as default
       CUSTOM_FUNCTION_TIMEOUT:
         process.env.CUSTOM_FUNCTION_TIMEOUT || 1 * 60 * 1000, // Timeout value for a customFun call
+      SERVICE_NAME: "munew-headless-agent",
     };
 
     if (process.env.AGENT_HOME) {

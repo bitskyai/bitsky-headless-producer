@@ -12,7 +12,7 @@
     "debug": "ndb ./index.js"
   },
   "dependencies": {
-    "bitspider-agent-baseservice": "0.4.3",
+    "bitspider-agent-baseservice": "0.5.0",
     "puppeteer": "3.0.4",
     "lodash": "4.17.15"
   },

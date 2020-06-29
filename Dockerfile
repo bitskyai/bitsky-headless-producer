@@ -1,7 +1,6 @@
 FROM alpine:3.12.0
 
 LABEL maintainer="Munew docker maintainers <help.munewio@gmail.com>"
-ENV REFRESHED_AT 2020-06-27
 
 ENV SCREENSHOT=false \
     HEADLESS=true \
@@ -145,6 +144,5 @@ CMD ["--wait"]
 LABEL munew.image.vendor="Munew" \
     munew.image.url="https://munew.io" \
     munew.image.title="Munew Headless Agent" \
-    munew.image.description="Response for collect intelligence data and send back to Analyst Service." \
-    munew.image.version="v0.1.1" \
+    munew.image.description="Response for excuting task that need to use chrome and send back to Analyst Service." \
     munew.image.documentation="https://docs.munew.io"
