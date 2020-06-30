@@ -90,7 +90,7 @@ ENV USER=alpine \
     VNC_PORT=5900 \
     VNC_RESOLUTION=1024x768 \
     VNC_COL_DEPTH=24  \
-    NOVNC_PORT=6080 \
+    NOVNC_PORT=6090 \
     NOVNC_HOME=/home/alpine/noVNC 
 
 RUN set -e \
