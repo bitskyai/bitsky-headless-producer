@@ -33,11 +33,6 @@
       "description": "Catch screenshot of current page",
       "value": "false",
       "required": false
-    },
-    "CUSTOM_FUNCTION_TIMEOUT": {
-      "description": "Timeout value when execute custom function. Default value is 60000ms",
-      "value": 60000,
-      "required": false
     }
   },
   "success_url": "/",
