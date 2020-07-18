@@ -2,7 +2,8 @@ const puppeteer = require("puppeteer");
 const _ = require("lodash");
 const path = require("path");
 const fs = require("fs");
-const { getAgentConfigs } = require("../utils");
+const { NodeVM } = require("vm2");
+// const { getAgentConfigs } = require("../utils");
 
 let __browser;
 
@@ -128,7 +129,7 @@ async function headlessWorker(options) {
           "--enable-audio-service-sandbox",
           `--user-data-dir=${userDataDir}`,
         ];
-        if(_.get(configs, "HEADLESS")){
+        if (_.get(configs, "HEADLESS")) {
           args.push("--headless");
         }
         ignoreDefaultArgs = true;
@@ -175,37 +176,49 @@ async function headlessWorker(options) {
                 jobId: jobId,
               });
               await page.goto(intelligence.url);
-              let functionBody = "";
+              let code = "";
+              let dataset, datasetError;
               // Check whether this intelligence need to execute custom script
               if (
                 intelligence &&
                 intelligence.metadata &&
                 intelligence.metadata.script
               ) {
-                functionBody = intelligence.metadata.script;
+                code = intelligence.metadata.script;
               }
-              if (functionBody) {
+
+              // execute custom code first
+              if (code) {
                 // if it has custom function, then in custom function will return collected intelligence
                 logger.debug(`Start run custom function.`, {
                   jobId: jobId,
                 });
-                let dataset;
                 try {
-                  dataset = await customFun(page, functionBody, intelligence);
+                  // dataset = await customFun(page, functionBody, intelligence);
+                  dataset = await sandboxVM({
+                    page,
+                    task: _.cloneDeep(intelligence), // to avoid user change intelligence
+                    code,
+                    logger
+                  });
                 } catch (err) {
                   // by design, when throw error or reject, both will return an Error object
-                  dataset = err;
+                  datasetError = err;
                 }
-                if (dataset instanceof Error) {
+
+                if (datasetError) {
                   logger.debug(
-                    `Evaluate customFun fail. Error: ${dataset.message}`,
+                    `Evaluate customFun fail. Error: ${_.get(
+                      datasetError,
+                      "message"
+                    )}`,
                     {
                       jobId: jobId,
-                      error: dataset,
+                      error: datasetError,
                     }
                   );
-                  setIntelligencesToFail(intelligence, dataset);
-                } else {
+                  setIntelligencesToFail(intelligence, datasetError);
+                } else if (dataset !== undefined && dataset !== null) {
                   logger.debug(`Evaluate customFun success.`, {
                     jobId: jobId,
                   });
@@ -214,8 +227,16 @@ async function headlessWorker(options) {
                   intelligence.system.agent.endedAt = Date.now();
                   intelligence.dataset = dataset;
                 }
-              } else {
-                logger.debug(`No customFun`, {
+              }
+
+              // Following case need to get whole page
+              // 1. if no `code`. Default is get whole page and send back
+              // 2. it has `code`, but not dataset collected and no error happen. This means `code` isn't for collect data, just want to wait or do some operation
+              if (
+                !code ||
+                ((dataset === undefined || dataset === null) && !datasetError)
+              ) {
+                logger.debug(`Need to get whole page and send back`, {
                   jobId: jobId,
                 });
                 // otherwise default collect currently page
@@ -290,64 +311,46 @@ async function headlessWorker(options) {
   }
 }
 
-/**
- * Custom function that created by SOI.
- *
- * TODO: Need to improve security
- * @param {string} functionBody - function body
- * @param {object} intelligence - intelligence object
- *
- * @return {object|Error} - return collected intelligences or error
- */
-async function customFun(page, functionBody, intelligence) {
+async function sandboxVM({ page, task, code, logger }) {
   try {
-    const configs = getAgentConfigs();
-    const dataset = await page.evaluate(
-      function (intelligence, functionBody, TIMEOUT) {
-        return new Promise((resolve, reject) => {
-          try {
-            // if passed functionBody contains function () {  }, remove it.
-            let match = functionBody
-              .toString()
-              .match(/function[^{]+\{([\s\S]*)\}$/);
-            if (match) {
-              functionBody = match[1];
-            }
-            let fun = new Function(
-              "resolve",
-              "reject",
-              "intelligence",
-              functionBody
-            );
+    const sandbox = {
+      $$page: page,
+      $$task: task,
+      $$_: _,
+      $$logger: logger
+    };
+    const vm = new NodeVM({
+      eval: false,
+      wasm: false,
+      require: true,
+      // to avoid conflit, add $ as prefix
+      sandbox,
+    });
+    // don't allow user to change global variable
+    vm.freeze(page, "$$page");
+    vm.freeze(task, "$$task");
+    vm.freeze(_, "$$_");
+    vm.freeze(_, "$$logger");
 
-            // TODO: Need to think about how to avoid custom script run too long
-            // https://github.com/munew/dia-agents-browserextensions/issues/16
-            fun(resolve, reject, intelligence);
-            setTimeout(() => {
-              reject(new Error("customFun evaluate timeout"));
-            }, TIMEOUT);
-          } catch (err) {
-            // if it isn't an error object, then create an error object
-            if (!(err instanceof Error)) {
-              err = new Error(err);
-            }
-            reject(err);
-          }
-        });
-      },
-      intelligence,
-      functionBody,
-      configs["CUSTOM_FUNCTION_TIMEOUT"]
+    const wrapper = vm.run(
+      `
+      module.exports = async function wrapper(resolve, reject, sandbox) {
+        try{
+          const result = await (${code})(sandbox);
+          resolve(result);
+        }catch(err){
+          reject(err);
+        }
+      }
+      `
     );
-    if (dataset instanceof Error) {
-      throw dataset;
-    }
-    return dataset;
+
+    const result = await new Promise((resolve, reject) => {
+      wrapper(resolve, reject, {});
+    });
+
+    return result;
   } catch (err) {
-    // if it isn't an error object, then create an error object
-    if (!(err instanceof Error)) {
-      err = new Error(err);
-    }
     throw err;
   }
 }
