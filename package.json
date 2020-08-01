@@ -1,6 +1,6 @@
 {
   "name": "dia-agents-headless",
-  "version": "0.3.0",
+  "version": "0.7.0",
   "main": "./index.js",
   "author": "help.munewio@gmail.com",
   "license": "Apache-2.0",
