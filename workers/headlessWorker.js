@@ -4,16 +4,9 @@ const path = require("path");
 const fs = require("fs");
 const { NodeVM } = require("vm2");
 // const { getAgentConfigs } = require("../utils");
+const { setIntelligencesToFail } = require('bitspider-agent-baseservice/lib/utils');
 
 let __browser;
-
-function setIntelligencesToFail(intelligence, err) {
-  _.set(intelligence, "system.state", "FAILED");
-  _.set(intelligence, "system.agent.endedAt", Date.now());
-  _.set(intelligence, "system.failuresReason", _.get(err, "message"));
-
-  return intelligence;
-}
 
 async function screenshot(page, jobId, globalId, screenshotFolder, logger) {
   try {
