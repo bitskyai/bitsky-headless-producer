@@ -332,6 +332,7 @@ async function sandboxVM({ page, task, code, logger }) {
           const result = await (${code})(sandbox);
           resolve(result);
         }catch(err){
+          sandbox.$$logger.error('Headless Worker -> sandboxVM fail',{error: err, task: sandbox.$$task});
           reject(err);
         }
       }
@@ -339,7 +340,7 @@ async function sandboxVM({ page, task, code, logger }) {
     );
 
     const result = await new Promise((resolve, reject) => {
-      wrapper(resolve, reject, {});
+      wrapper(resolve, reject, sandbox);
     });
 
     return result;
