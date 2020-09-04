@@ -1,6 +1,6 @@
 FROM alpine:3.12.0
 
-LABEL maintainer="Munew docker maintainers <help.munewio@gmail.com>"
+LABEL maintainer="Munew docker maintainers <help.bitskyai@gmail.com>"
 
 ENV SCREENSHOT=false \
     HEADLESS=true \

@@ -1,4 +1,4 @@
-const Baseservice = require("bitspider-agent-baseservice");
+const Baseservice = require("@bitskyai/producer-sdk");
 const _ = require("lodash");
 const { headlessWorker, resetHeadlessWorker } = require("./workers/headlessWorker");
 const { getAgentConfigs } = require("./utils");

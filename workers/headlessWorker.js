@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const { NodeVM } = require("vm2");
 // const { getAgentConfigs } = require("../utils");
-const { setIntelligencesToFail } = require('bitspider-agent-baseservice/lib/utils');
+const { setIntelligencesToFail } = require('@bitskyai/producer-sdk/lib/utils');
 
 let __browser;
 
