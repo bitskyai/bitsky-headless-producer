@@ -1,6 +1,6 @@
 {
-  "name": "dia-agents-headless",
-  "version": "0.7.0",
+  "name": "@bitskyai/headless-producer",
+  "version": "0.1.0",
   "main": "./index.js",
   "author": "help.bitskyai@gmail.com",
   "license": "Apache-2.0",
@@ -12,9 +12,9 @@
     "debug": "ndb ./index.js"
   },
   "dependencies": {
-    "@bitskyai/producer-sdk": "0.6.0",
+    "@bitskyai/producer-sdk": "0.1.0",
     "puppeteer": "3.0.4",
-    "lodash": "4.17.15",
+    "lodash": "4.17.20",
     "vm2":"3.9.2"
   },
   "devDependencies": {
