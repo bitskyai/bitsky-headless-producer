@@ -1,14 +1,14 @@
-# Munew Headless Agent
+# BitSky Headless Agent
 
 ## Configuration
 
 ### Environment Variables
 
-1. `MUNEW_BASE_URL`{String}: **Required**. Your Munew Application's base url. Example: `https://munew.herokuapp.com`
+1. `BITSKY_BASE_URL`{String}: **Required**. Your BitSky Application's base url. Example: `https://bitsky.herokuapp.com`
 2. `GLOBAL_ID`{String}: **Required**. Global ID of the headless agent you want to connect. Example: `YWdlbnQ6OjE1OTMwNjYzODY5MDU6OmU3MjAwZmU5LWViZTktNDc3Zi1hMDY1LTEzYjFiOTQ3YTAyMQ==`
-3. `AGENT_SERIAL_ID`{String}: **Optional**. An UUID to idenity this agent, better you keep same value for this agent. If you didn't provide then it will automatically generate one for you. Example: `b7f6a100-9a35-4df3-bef9-2c1f6d8c866e`
+3. `PRODUCER_SERIAL_ID`{String}: **Optional**. An UUID to idenity this agent, better you keep same value for this agent. If you didn't provide then it will automatically generate one for you. Example: `b7f6a100-9a35-4df3-bef9-2c1f6d8c866e`
 4. `LOG_LEVEL`{String}: **Optional**. Winston logging level. Default is `info`, find detail from [Winston Logging Levels](https://github.com/winstonjs/winston#logging-levels)
-5. `AGENT_HOME`{String}: **Optional**. How folder of your agent. You need to set absolute path. If you provide this, then like logs or screenshots will be stored in this folder. This is useful when you want to save the logs or screenshots in docker. You can mount a volumn to docker, and set `AGENT_HOME` to this volumn 5.`SCREENSHOT`{Boolean}: **Optional**. Take a screenshot of current page, Default will not take a screenshot. You can view them by open [http://{your agent host}:{port}/screenshots](http://{your_agent_host}:{port}/screenshots). All the screenshot name is `${timestamp}$-{task_global_id}`, for example: `1593489075864-aW50ZWxsaWdlbmNlOjoxNTkzNDg5MDQwNjkzOjoyMDc4YmQyYy0wNTY2LTRmOGQtYTUxZC01ZGZiZDVkNGQ4YzQ=`
+5. `PRODUCER_HOME`{String}: **Optional**. How folder of your agent. You need to set absolute path. If you provide this, then like logs or screenshots will be stored in this folder. This is useful when you want to save the logs or screenshots in docker. You can mount a volumn to docker, and set `PRODUCER_HOME` to this volumn 5.`SCREENSHOT`{Boolean}: **Optional**. Take a screenshot of current page, Default will not take a screenshot. You can view them by open [http://{your agent host}:{port}/screenshots](http://{your_agent_host}:{port}/screenshots). All the screenshot name is `${timestamp}$-{task_global_id}`, for example: `1593489075864-aW50ZWxsaWdlbmNlOjoxNTkzNDg5MDQwNjkzOjoyMDc4YmQyYy0wNTY2LTRmOGQtYTUxZC01ZGZiZDVkNGQ4YzQ=`
 6. `HEADLESS`{Boolean}: **Optional**. Whether to run browser in [headless mode](https://developers.google.com/web/updates/2017/04/headless-chrome). Default is `true`, will run headless mode. If you are not use docker image to deploy headless agent to heroku, then set `HEADLESS` to `false` is useless
 7. `CUSTOM_FUNCTION_TIMEOUT`{Number}: **Optiona**. Timeout value when execute custom function. Default value is `60000`ms
 8. `PORT`: **Optional**. Port number for this server. Default value is `80`, when you run it in docker mode, you can map host port to `80`
@@ -27,7 +27,7 @@ If you want to run it local, make sure you already installed [NodeJS](https://no
 1. Install node_modules. `yarn install`
 2. Start server
    ```
-   export MUNEW_BASE_URL=http://10.0.0.247:9199 && \
+   export BITSKY_BASE_URL=http://10.0.0.247:9199 && \
    export GLOBAL_ID=YWdlbnQ6OjE1OTM0OTkyMTQ3ODc6OmI1Y2ZkYzY4LTE4OTctNDk0Yy04NTEwLTVkYjg0MGRlYjdlMg== && \
    npm start
    ```
@@ -41,8 +41,8 @@ If you want to run it local, make sure you already installed [NodeJS](https://no
 
 ```
 docker run -p 80:80 \
-           -e MUNEW_BASE_URL=http://10.0.0.247:9099 \
-           -e GLOBAL_ID=YWdlbnQ6OjE1OTM0MDMyODEzMDU6OmE1ODQ0NWQzLTc2YWItNDA1Ny1hZmZjLWNhMjQyMWFhMmI1Mg==  munew/headless-agent
+           -e BITSKY_BASE_URL=http://10.0.0.247:9099 \
+           -e GLOBAL_ID=YWdlbnQ6OjE1OTM0MDMyODEzMDU6OmE1ODQ0NWQzLTc2YWItNDA1Ny1hZmZjLWNhMjQyMWFhMmI1Mg==  bitskyai/headless-producer
 ```
 
 > You also can change other Environment Variables

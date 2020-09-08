@@ -1,6 +1,6 @@
 {
-  "name": "munew-headless-agent",
-  "description": "Headless agent is good for crawl data from SPA",
+  "name": "bitsky-headless-producer",
+  "description": "Headless Producer is good for crawl data from SPA",
   "keywords": [
     "web crawling",
     "web scraping",
@@ -9,18 +9,18 @@
     "automation",
     "nodejs"
   ],
-  "website": "https://munew.io",
-  "logo": "https://raw.githubusercontent.com/munew/dia-electron/master/assets/icons/munew512.png",
+  "website": "https://bitsky.ai",
+  "logo": "https://raw.githubusercontent.com/bitskyai/bitsky-desktop-app/master/assets/icons/munew512.png",
   "env": {
-    "MUNEW_BASE_URL": {
-      "description": "Your Munew Application's base url. Example: https://munew.herokuapp.com",
+    "BITSKY_BASE_URL": {
+      "description": "Your BitSky Application's base url. Example: https://bitsky.herokuapp.com",
       "required": true
     },
     "GLOBAL_ID": {
-      "description": "Global ID of the headless agent you want to connect. Example: YWdlbnQ6OjE1OTMwNjYzODY5MDU6OmU3MjAwZmU5LWViZTktNDc3Zi1hMDY1LTEzYjFiOTQ3YTAyMQ==",
+      "description": "Global ID of the headless producer you want to connect. Example: YWdlbnQ6OjE1OTMwNjYzODY5MDU6OmU3MjAwZmU5LWViZTktNDc3Zi1hMDY1LTEzYjFiOTQ3YTAyMQ==",
       "required": true
     },
-    "AGENT_SERIAL_ID": {
+    "PRODUCER_SERIAL_ID": {
       "description": "An UUID to idenity this agent, better you keep same value for this agent. If you didn't provide then it will automatically generate one for you. Example: b7f6a100-9a35-4df3-bef9-2c1f6d8c866e",
       "required": false
     },

@@ -9,11 +9,11 @@ function getConfigs() {
       // otherwise, keep it as default
       CUSTOM_FUNCTION_TIMEOUT:
         process.env.CUSTOM_FUNCTION_TIMEOUT || 1 * 60 * 1000, // Timeout value for a customFun call
-      SERVICE_NAME: "munew-headless-agent",
+      SERVICE_NAME: "bitsky-headless-producer",
     };
 
-    if (process.env.AGENT_HOME) {
-      configs.AGENT_HOME = process.env.AGENT_HOME;
+    if (process.env.PRODUCER_HOME) {
+      configs.PRODUCER_HOME = process.env.PRODUCER_HOME;
     }
 
     if (process.env.PUPPETEER_EXECUTABLE_PATH) {

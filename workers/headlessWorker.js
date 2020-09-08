@@ -142,8 +142,8 @@ async function headlessWorker(options) {
       });
     }
     let screenshotFolder;
-    if (configs["AGENT_HOME"]) {
-      screenshotFolder = path.join(configs["AGENT_HOME"], "screenshots");
+    if (configs["PRODUCER_HOME"]) {
+      screenshotFolder = path.join(configs["PRODUCER_HOME"], "screenshots");
     } else {
       const publicFolder = baseservice.getDefaultPublic();
       screenshotFolder = path.join(publicFolder, "screenshots");
