@@ -217,7 +217,7 @@ async function headlessWorker(options) {
                   });
                   // also update intelligence state
                   intelligence.system.state = "FINISHED";
-                  intelligence.system.agent.endedAt = Date.now();
+                  intelligence.system.producer.endedAt = Date.now();
                   intelligence.dataset = dataset;
                 }
               }
@@ -245,7 +245,7 @@ async function headlessWorker(options) {
                     },
                   };
                   intelligence.system.state = "FINISHED";
-                  intelligence.system.agent.endedAt = Date.now();
+                  intelligence.system.producer.endedAt = Date.now();
                   logger.debug(`Execute intelligence successful `, {
                     jobId: jobId,
                   });

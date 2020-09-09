@@ -6,7 +6,7 @@ ENV SCREENSHOT=false \
     HEADLESS=true \
     INST_SCRIPTS=/tmp/scripts \
     STARTUPDIR=/dockerstartup \
-    AGENT_DIR=/home/alpine/agent \
+    AGENT_DIR=/home/alpine/producer \
     NGINX_DIR=/home/alpine/nginx \
     HEADLESS_PORT=8090 \
     NGINX_PORT=80
@@ -110,7 +110,7 @@ COPY alpine/run_novnc /usr/bin/
 WORKDIR $HOME
 EXPOSE $VNC_PORT $NOVNC_PORT $HEADLESS_PORT $NGINX_PORT
 
-# Copy all files for Headless agent    
+# Copy all files for Headless producer    
 COPY workers ${AGENT_DIR}/workers/
 COPY agentConfigs.js ${AGENT_DIR}/
 COPY index.js ${AGENT_DIR}/

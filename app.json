@@ -21,7 +21,7 @@
       "required": true
     },
     "PRODUCER_SERIAL_ID": {
-      "description": "An UUID to idenity this agent, better you keep same value for this agent. If you didn't provide then it will automatically generate one for you. Example: b7f6a100-9a35-4df3-bef9-2c1f6d8c866e",
+      "description": "An UUID to idenity this producer, better you keep same value for this producer. If you didn't provide then it will automatically generate one for you. Example: b7f6a100-9a35-4df3-bef9-2c1f6d8c866e",
       "required": false
     },
     "LOG_LEVEL": {
