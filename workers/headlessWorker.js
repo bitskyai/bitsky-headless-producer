@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const { NodeVM } = require("vm2");
 // const { getProducerConfigs } = require("../utils");
-const { setIntelligencesToFail } = require('@bitskyai/producer-sdk/lib/utils');
+const { setTasksToFail } = require('@bitskyai/producer-sdk/lib/utils');
 
 let __browser;
 
@@ -48,11 +48,11 @@ function getChromiumExecPath() {
 async function headlessWorker(options) {
   const jobId = _.get(options, "jobId");
   const logger = _.get(options, "context.logger");
-  const intelligences = _.get(options, "intelligences");
+  const tasks = _.get(options, "tasks");
   try {
-    if (!intelligences || !intelligences.length) {
+    if (!tasks || !tasks.length) {
       if (__browser) {
-        logger.debug(`intelligences length is ${intelligences.length}`);
+        logger.debug(`tasks length is ${tasks.length}`);
         await __browser.close();
         __browser = undefined;
       }
@@ -155,42 +155,42 @@ async function headlessWorker(options) {
 
     let pages = await __browser.pages();
     const promises = [];
-    for (let i = 0; i < intelligences.length; i++) {
-      let intelligence = intelligences[i];
+    for (let i = 0; i < tasks.length; i++) {
+      let task = tasks[i];
       let page = pages[i];
       promises.push(
-        (function (page, intelligence) {
+        (function (page, task) {
           return new Promise(async (resolve, reject) => {
             try {
               if (!page) {
                 page = await __browser.newPage();
               }
-              logger.debug(`intelligence URL: ${intelligence.url}`, {
+              logger.debug(`task URL: ${task.url}`, {
                 jobId: jobId,
               });
-              await page.goto(intelligence.url);
+              await page.goto(task.url);
               let code = "";
               let dataset, datasetError;
-              // Check whether this intelligence need to execute custom script
+              // Check whether this task need to execute custom script
               if (
-                intelligence &&
-                intelligence.metadata &&
-                intelligence.metadata.script
+                task &&
+                task.metadata &&
+                task.metadata.script
               ) {
-                code = intelligence.metadata.script;
+                code = task.metadata.script;
               }
 
               // execute custom code first
               if (code) {
-                // if it has custom function, then in custom function will return collected intelligence
+                // if it has custom function, then in custom function will return collected task
                 logger.debug(`Start run custom function.`, {
                   jobId: jobId,
                 });
                 try {
-                  // dataset = await customFun(page, functionBody, intelligence);
+                  // dataset = await customFun(page, functionBody, task);
                   dataset = await sandboxVM({
                     page,
-                    task: _.cloneDeep(intelligence), // to avoid user change intelligence
+                    task: _.cloneDeep(task), // to avoid user change task
                     code,
                     logger
                   });
@@ -210,15 +210,15 @@ async function headlessWorker(options) {
                       error: datasetError,
                     }
                   );
-                  setIntelligencesToFail(intelligence, datasetError);
+                  setTasksToFail(task, datasetError);
                 } else if (dataset !== undefined && dataset !== null) {
                   logger.debug(`Evaluate customFun success.`, {
                     jobId: jobId,
                   });
-                  // also update intelligence state
-                  intelligence.system.state = "FINISHED";
-                  intelligence.system.producer.endedAt = Date.now();
-                  intelligence.dataset = dataset;
+                  // also update task state
+                  task.system.state = "FINISHED";
+                  task.system.producer.endedAt = Date.now();
+                  task.dataset = dataset;
                 }
               }
 
@@ -237,21 +237,21 @@ async function headlessWorker(options) {
                   const content = await page.$eval("html", (elem) => {
                     return elem && elem.innerHTML;
                   });
-                  intelligence.dataset = {
+                  task.dataset = {
                     url: page.url(),
                     data: {
                       contentType: "html",
                       content: content,
                     },
                   };
-                  intelligence.system.state = "FINISHED";
-                  intelligence.system.producer.endedAt = Date.now();
-                  logger.debug(`Execute intelligence successful `, {
+                  task.system.state = "FINISHED";
+                  task.system.producer.endedAt = Date.now();
+                  logger.debug(`Execute task successful `, {
                     jobId: jobId,
                   });
                 } catch (err) {
-                  setIntelligencesToFail(intelligence, err);
-                  logger.debug(`Execute intelligence fail`, {
+                  setTasksToFail(task, err);
+                  logger.debug(`Execute task fail`, {
                     jobId: jobId,
                   });
                 }
@@ -261,36 +261,36 @@ async function headlessWorker(options) {
                 await screenshot(
                   page,
                   jobId,
-                  _.get(intelligence, "globalId"),
+                  _.get(task, "globalId"),
                   screenshotFolder,
                   logger
                 );
               }
               logger.debug(
-                `Execute intlligence - ${intelligence.globalId} successful`,
+                `Execute intlligence - ${task.globalId} successful`,
                 {
                   jobId: jobId,
                 }
               );
-              resolve(intelligence);
+              resolve(task);
             } catch (err) {
               logger.error(
-                `collect intelligence fail. globalId: ${intelligence.globalId}. Error: ${err.message}`
+                `collect task fail. globalId: ${task.globalId}. Error: ${err.message}`
               );
-              setIntelligencesToFail(intelligence, err);
+              setTasksToFail(task, err);
               if (configs["SCREENSHOT"]) {
                 await screenshot(
                   page,
                   jobId,
-                  _.get(intelligence, "globalId"),
+                  _.get(task, "globalId"),
                   screenshotFolder,
                   logger
                 );
               }
-              reject(intelligence);
+              reject(task);
             }
           });
-        })(page, intelligence)
+        })(page, task)
       );
     }
 
