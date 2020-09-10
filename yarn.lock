@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@bitskyai/producer-sdk@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@bitskyai/producer-sdk/-/producer-sdk-0.1.0.tgz#819c90406f98726e7746f52ca9deb2938851f043"
-  integrity sha512-zBjefGbCQJ/IJBOPcgYvm/nnXMmZrTv3P7FwY/L/bivYm4epnBWfy3BxOumtZXGR2WAtRbSc9MMelbiu3yAdYw==
+"@bitskyai/producer-sdk@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@bitskyai/producer-sdk/-/producer-sdk-0.1.1.tgz#872ef5fc70fe3fc4d4af778ff266d794319cefc5"
+  integrity sha512-qU9YC6C64tMxD+NfB5X3Z0bExuhbFkfdeGU7v7+CBUSFfnNfRskNvyZfzN7Mm/nVuGO0AClGuRhsXnXaeDxypg==
   dependencies:
     axios "0.20.0"
     cookie-parser "1.4.5"
