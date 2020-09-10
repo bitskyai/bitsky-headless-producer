@@ -2,5 +2,5 @@
 ### every exit != 0 fails the script
 set -e
 
-cd ${AGENT_DIR}
+cd ${PRODUCER_DIR}
 yarn start

@@ -1,5 +1,5 @@
-const { getConfigs } = require("./agentConfigs");
+const { getConfigs } = require("./producerConfigs");
 
 module.exports = {
-  getAgentConfigs: getConfigs,
+  getProducerConfigs: getConfigs,
 };

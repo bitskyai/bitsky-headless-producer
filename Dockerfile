@@ -6,7 +6,7 @@ ENV SCREENSHOT=false \
     HEADLESS=true \
     INST_SCRIPTS=/tmp/scripts \
     STARTUPDIR=/dockerstartup \
-    AGENT_DIR=/home/alpine/producer \
+    PRODUCER_DIR=/home/alpine/producer \
     NGINX_DIR=/home/alpine/nginx \
     HEADLESS_PORT=8090 \
     NGINX_PORT=80
@@ -111,20 +111,20 @@ WORKDIR $HOME
 EXPOSE $VNC_PORT $NOVNC_PORT $HEADLESS_PORT $NGINX_PORT
 
 # Copy all files for Headless producer    
-COPY workers ${AGENT_DIR}/workers/
-COPY agentConfigs.js ${AGENT_DIR}/
-COPY index.js ${AGENT_DIR}/
-COPY package.json ${AGENT_DIR}/
-COPY server.js ${AGENT_DIR}/
-COPY utils-docker.js ${AGENT_DIR}/utils.js
-COPY yarn.lock ${AGENT_DIR}/
-COPY README.md ${AGENT_DIR}/
+COPY workers ${PRODUCER_DIR}/workers/
+COPY producerConfigs.js ${PRODUCER_DIR}/
+COPY index.js ${PRODUCER_DIR}/
+COPY package.json ${PRODUCER_DIR}/
+COPY server.js ${PRODUCER_DIR}/
+COPY utils-docker.js ${PRODUCER_DIR}/utils.js
+COPY yarn.lock ${PRODUCER_DIR}/
+COPY README.md ${PRODUCER_DIR}/
 
 # Copy nginx filea
 COPY alpine/nginx ${NGINX_DIR}
 
 ### Install only production node_modules
-RUN cd ${AGENT_DIR}/ && yarn --production=true
+RUN cd ${PRODUCER_DIR}/ && yarn --production=true
 
 COPY alpine/startup $STARTUPDIR
 # RUN ${INST_SCRIPTS}/set_user_permission.sh $STARTUPDIR $HOME $NGINX_DIR

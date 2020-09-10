@@ -1,7 +1,7 @@
 /* eslint-disable no-process-env */
 // Env vars should be casted to correct types
 
-// Get Specific Agent Configuration
+// Get Specific Producer Configuration
 function getConfigs() {
   try {
     let configs = {

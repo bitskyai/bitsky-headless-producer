@@ -1,7 +1,7 @@
 const Baseservice = require("@bitskyai/producer-sdk");
 const _ = require("lodash");
 const { headlessWorker, resetHeadlessWorker } = require("./workers/headlessWorker");
-const { getAgentConfigs } = require("./utils");
+const { getProducerConfigs } = require("./utils");
 
 let __baseservice = undefined;
 
@@ -14,7 +14,7 @@ module.exports = {
     try {
       await resetHeadlessWorker();
       // get default configurations
-      const defaultConfigs = getAgentConfigs();
+      const defaultConfigs = getProducerConfigs();
       // merge with customer configs
       configs = _.merge({}, defaultConfigs, configs);
        __baseservice = new Baseservice(configs);

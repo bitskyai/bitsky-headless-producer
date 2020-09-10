@@ -1,7 +1,7 @@
-const { getConfigs } = require("./agentConfigs");
+const { getConfigs } = require("./producerConfigs");
 
-// Get Specific Agent Configuration
-function getAgentConfigs() {
+// Get Specific Producer Configuration
+function getProducerConfigs() {
   try {
     let configs = getConfigs(); 
     configs.PORT = Number(process.env.HEADLESS_PORT) || 8090; // server port number
@@ -13,5 +13,5 @@ function getAgentConfigs() {
 }
 
 module.exports = {
-  getAgentConfigs,
+  getProducerConfigs,
 };
