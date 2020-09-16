@@ -1,6 +1,6 @@
 {
   "name": "@bitskyai/headless-producer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "./index.js",
   "author": "help.bitskyai@gmail.com",
   "license": "Apache-2.0",
@@ -12,10 +12,10 @@
     "debug": "ndb ./index.js"
   },
   "dependencies": {
-    "@bitskyai/producer-sdk": "0.1.1",
+    "@bitskyai/producer-sdk": "0.1.2",
     "puppeteer": "3.0.4",
     "lodash": "4.17.20",
-    "vm2":"3.9.2"
+    "vm2": "3.9.2"
   },
   "devDependencies": {
     "ndb": "^1.1.5"

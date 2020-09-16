@@ -117,14 +117,14 @@ COPY index.js ${PRODUCER_DIR}/
 COPY package.json ${PRODUCER_DIR}/
 COPY server.js ${PRODUCER_DIR}/
 COPY utils-docker.js ${PRODUCER_DIR}/utils.js
-COPY yarn.lock ${PRODUCER_DIR}/
+COPY package-lock.json ${PRODUCER_DIR}/
 COPY README.md ${PRODUCER_DIR}/
 
 # Copy nginx filea
 COPY alpine/nginx ${NGINX_DIR}
 
 ### Install only production node_modules
-RUN cd ${PRODUCER_DIR}/ && yarn --production=true
+RUN cd ${PRODUCER_DIR}/ && npm ci --only=production
 
 COPY alpine/startup $STARTUPDIR
 # RUN ${INST_SCRIPTS}/set_user_permission.sh $STARTUPDIR $HOME $NGINX_DIR
