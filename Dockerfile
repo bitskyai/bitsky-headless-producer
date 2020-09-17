@@ -142,7 +142,7 @@ CMD ["--wait"]
 
 # Metadata
 LABEL bitsky.image.vendor="BitSky" \
-    bitsky.image.url="https://bitsky.ai" \
+    bitsky.image.url="https://www.bitsky.ai" \
     bitsky.image.title="BitSky Headless Producer" \
     bitsky.image.description="Response for excuting task that need to use chrome and send back to Retailer Service." \
     bitsky.image.documentation="https://docs.bitsky.ai"

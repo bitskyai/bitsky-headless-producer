@@ -3,4 +3,4 @@
 set -e
 
 cd ${PRODUCER_DIR}
-yarn start
+npm start
