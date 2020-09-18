@@ -1,4 +1,4 @@
-FROM alpine:3.12.0
+FROM alpine:3.11.0
 
 LABEL maintainer="BitSky docker maintainers <help.bitskyai@gmail.com>"
 
@@ -24,18 +24,19 @@ RUN find ${INST_SCRIPTS} -name '*.sh' -exec chmod a+x {} +
 # Install libraries, like python, nodejs, yarn
 # Install common tools, like vim 
 RUN set -e \
-    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories \
-    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-    && echo "http://dl-cdn.alpinelinux.org/alpine/v3.11/main" >> /etc/apk/repositories \
-    && apk upgrade -U -a \
-    && apk add --no-cache \
+    # && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories \
+    # && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+    # && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+    # && echo "http://dl-cdn.alpinelinux.org/alpine/v3.11/main" >> /etc/apk/repositories \
+    && apk update \
+    && apk upgrade \
+    && apk add --update --no-cache --update-cache \
     xvfb \
     x11vnc \ 
     xfce4 \ 
     xfce4-terminal \ 
     paper-icon-theme \
-    arc-theme \
+    # arc-theme \
     libstdc++ \
     python \
     chromium \
@@ -43,7 +44,7 @@ RUN set -e \
     nss \
     freetype \
     ttf-freefont \
-    wqy-zenhei \
+    # wqy-zenhei \
     bash \
     sudo \
     htop \
