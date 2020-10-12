@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const { NodeVM } = require("vm2");
 // const { getProducerConfigs } = require("../utils");
-const { setTasksToFail } = require('@bitskyai/producer-sdk/lib/utils');
+const { setTasksToFail } = require("@bitskyai/producer-sdk/lib/utils");
 
 let __browser;
 
@@ -45,6 +45,39 @@ function getChromiumExecPath() {
   return puppeteer.executablePath().replace("app.asar", "app.asar.unpacked");
 }
 
+async function abortRequestByResourceTypes(page, configs, logger) {
+  try {
+    await page.setRequestInterception(true);
+    const abortRequestTypes = _.get(configs, "ABORT_RESOURCE_TYPES");
+    if (abortRequestTypes) {
+      const resourceTypes = abortRequestTypes.split(",") || [];
+      page.on("request", (req) => {
+        let ignore = false;
+        for (let i = 0; i < resourceTypes.length; i++) {
+          let resourceType = _.trim(resourceTypes[i]);
+          resourceType = _.toLower(resourceType);
+          if (_.toLower(req.resourceType()) == resourceType) {
+            ignore = true;
+            break;
+          }
+        }
+        if (ignore) {
+          logger && logger.debug(`abort ${req.url()}`);
+          req.abort();
+        } else {
+          logger && logger.debug(`continue ${req.url()}`);
+          req.continue();
+        }
+      });
+    }
+  } catch (err) {
+    logger &&
+      logger.error(`abortRequestByResourceTypes fail: ${err.message}`, {
+        error: err,
+      });
+  }
+}
+
 async function headlessWorker(options) {
   const jobId = _.get(options, "jobId");
   const logger = _.get(options, "context.logger");
@@ -82,7 +115,12 @@ async function headlessWorker(options) {
         userDataDir = undefined;
       }
 
-      let args = ["--no-sandbox", "--disable-setuid-sandbox"];
+      let args = [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--start-fullscreen",
+        "--start-maximized",
+      ];
       let ignoreDefaultArgs = false;
       if (userDataDir) {
         // args = [
@@ -112,7 +150,7 @@ async function headlessWorker(options) {
         //   "--enable-audio-service-sandbox",
         //   `--user-data-dir=${userDataDir}`,
         // ];
-        args = [
+        args = args.concat([
           "--disable-dev-shm-usage",
           "--disable-gpu",
           "--disable-breakpad",
@@ -121,14 +159,14 @@ async function headlessWorker(options) {
           // "--flag-switches-end",
           "--enable-audio-service-sandbox",
           `--user-data-dir=${userDataDir}`,
-        ];
+        ]);
         if (_.get(configs, "HEADLESS")) {
           args.push("--headless");
         }
         ignoreDefaultArgs = true;
       }
 
-      logger.debug(`Chrome Executeable Path: ${executablePath}`);
+      // logger.debug(`Chrome Executeable Path: ${executablePath}`);
       const params = {
         args: args,
         ignoreDefaultArgs,
@@ -136,7 +174,14 @@ async function headlessWorker(options) {
         defaultViewport: null,
         executablePath,
       };
+      logger.info(`puppeteer launch params`, {
+        params,
+      });
       __browser = await puppeteer.launch(params);
+      let pages = await __browser.pages();
+      for (let i = 0; i < pages.length; i++) {
+        await abortRequestByResourceTypes(pages[i], configs, logger);
+      }
       logger.debug(`Puppeteer launch browser successful`, {
         jobId: jobId,
       });
@@ -157,6 +202,7 @@ async function headlessWorker(options) {
     const promises = [];
     for (let i = 0; i < tasks.length; i++) {
       let task = tasks[i];
+      // skip first tab,
       let page = pages[i];
       promises.push(
         (function (page, task) {
@@ -164,19 +210,17 @@ async function headlessWorker(options) {
             try {
               if (!page) {
                 page = await __browser.newPage();
+                await abortRequestByResourceTypes(page, configs, logger);
               }
               logger.debug(`task URL: ${task.url}`, {
                 jobId: jobId,
               });
+
               await page.goto(task.url);
               let code = "";
               let dataset, datasetError;
               // Check whether this task need to execute custom script
-              if (
-                task &&
-                task.metadata &&
-                task.metadata.script
-              ) {
+              if (task && task.metadata && task.metadata.script) {
                 code = task.metadata.script;
               }
 
@@ -192,7 +236,7 @@ async function headlessWorker(options) {
                     page,
                     task: _.cloneDeep(task), // to avoid user change task
                     code,
-                    logger
+                    logger,
                   });
                 } catch (err) {
                   // by design, when throw error or reject, both will return an Error object
@@ -310,7 +354,7 @@ async function sandboxVM({ page, task, code, logger }) {
       $$page: page,
       $$task: task,
       $$_: _,
-      $$logger: logger
+      $$logger: logger,
     };
     const vm = new NodeVM({
       eval: false,

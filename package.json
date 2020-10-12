@@ -12,9 +12,8 @@
     "debug": "ndb ./index.js"
   },
   "dependencies": {
-    "@bitskyai/producer-sdk": "0.2.0",
+    "@bitskyai/producer-sdk": "0.2.2",
     "puppeteer": "3.0.4",
-    "lodash": "4.17.20",
     "vm2": "3.9.2"
   },
   "devDependencies": {

@@ -36,6 +36,12 @@ function getConfigs() {
       configs.SCREENSHOT = false;
     }
 
+    if (process.env.ABORT_RESOURCE_TYPES) {
+      configs.ABORT_RESOURCE_TYPES = process.env.ABORT_RESOURCE_TYPES;
+    } else {
+      configs.ABORT_RESOURCE_TYPES = "font,image,media";
+    }
+
     return configs;
   } catch (err) {
     console.error("headless->getConfigs fail!", err);
