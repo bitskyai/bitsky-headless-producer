@@ -12,7 +12,7 @@
 6. `HEADLESS`{Boolean}: **Optional**. Whether to run browser in [headless mode](https://developers.google.com/web/updates/2017/04/headless-chrome). Default is `true`, will run headless mode. If you are not use docker image to deploy headless producer to heroku, then set `HEADLESS` to `false` is useless
 7. `SCREENSHOT`{Boolean}: **Optional**. Whether to create screenshot for each Task.
 8. `CUSTOM_FUNCTION_TIMEOUT`{Number}: **Optiona**. Timeout value when execute custom function. Default value is `60000`ms
-9. `ABORT_RESOURCE_TYPES`{String}: **Optional**. What kind of resource type you want to abort, use `,` to sperate each type. This is useful for improve performance and crawl speed. Default `font,image,media`. Possible [Resource Types](https://pptr.dev/#?product=Puppeteer&version=v5.3.1&show=api-httprequestresourcetype)
+9. `ABORT_RESOURCE_TYPES`{String}: **Optional**. What kind of resource type you want to abort, use `,` to sperate each type. This is useful for improve performance and crawl speed. Default `''`. Possible [Resource Types](https://pptr.dev/#?product=Puppeteer&version=v5.3.1&show=api-httprequestresourcetype)
 10. `PORT`: **Optional**. Port number for this server. Default value is `80`, when you run it in docker mode, you can map host port to `80`
 11. `HEADLESS_PORT`: **Optional**, Port number for your headless producer. This value is only used if you run **Headless Producer** in docker mode, in docker mode, we start a nginx to proxy **Headless Producer** and **NoVNC**.
 12. `PUPPETEER_EXECUTABLE_PATH`: **Optional**. Path to a browser executable to run instead of the bundled Chromium. **Don't** change this value in Docker and Heroku

@@ -48,7 +48,11 @@ function getChromiumExecPath() {
 async function abortRequestByResourceTypes(page, configs, logger) {
   try {
     await page.setRequestInterception(true);
-    const abortRequestTypes = _.get(configs, "ABORT_RESOURCE_TYPES");
+    let abortRequestTypes = _.get(configs, "ABORT_RESOURCE_TYPES");
+    logger && logger.debug(`abortRequestTypes ${abortRequestTypes}`);
+    if(!abortRequestTypes||abortRequestTypes==='undefined'||abortRequestTypes==='false'||abortRequestTypes==='null'){
+      abortRequestTypes = 'undefined';
+    }
     if (abortRequestTypes) {
       const resourceTypes = abortRequestTypes.split(",") || [];
       page.on("request", (req) => {

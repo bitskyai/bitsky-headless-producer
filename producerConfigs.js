@@ -39,7 +39,8 @@ function getConfigs() {
     if (process.env.ABORT_RESOURCE_TYPES) {
       configs.ABORT_RESOURCE_TYPES = process.env.ABORT_RESOURCE_TYPES;
     } else {
-      configs.ABORT_RESOURCE_TYPES = "font,image,media";
+      // configs.ABORT_RESOURCE_TYPES = "font,image,media";
+      configs.ABORT_RESOURCE_TYPES = undefined;
     }
 
     return configs;
