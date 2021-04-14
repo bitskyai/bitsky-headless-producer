@@ -371,7 +371,7 @@ async function sandboxVM({ page, task, code, logger }) {
     vm.freeze(page, "$$page");
     vm.freeze(task, "$$task");
     vm.freeze(_, "$$_");
-    vm.freeze(_, "$$logger");
+    vm.freeze(logger, "$$logger");
 
     const wrapper = vm.run(
       `
